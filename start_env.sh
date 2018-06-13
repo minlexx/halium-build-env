@@ -8,6 +8,7 @@
 DEVICE=$1
 
 docker run \
+    --privileged \
     -it \
     --rm \
     --device=$DEVICE \
