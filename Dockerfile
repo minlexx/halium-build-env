@@ -29,6 +29,13 @@ RUN apt -y install gnupg flex bison gperf \
   python-markdown libxml2-utils xsltproc zlib1g-dev:i386 schedtool \
   repo liblz4-tool bc lzop
 
+# halium docs don't say that, but imagemagick is also needed (for mka mkbootimg)
+RUN apt install -y imagemagick
+# cpio is needed to build images...
+RUN apt install -y cpio
+# required by JBB's halium-install-standalone
+RUN apt install -y qemu binfmt-support qemu-user-static e2fsprogs sudo
+
 RUN mkdir -p /home/halium
 WORKDIR /home/halium
  
