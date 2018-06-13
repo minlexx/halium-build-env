@@ -9,11 +9,20 @@ RUN apt update && apt -y upgrade
 RUN apt install -y usbutils net-tools android-tools-adb android-tools-fsutils
 
 # deps for building heimdall from source
-RUN apt install -y git build-essential
-RUN apt install -y zlib1g-dev libssl-dev
+RUN apt install -y build-essential git cmake
+RUN apt install -y zlib1g-dev libssl-dev libusb-1.0.0-dev libgl1-mesa-glx libgl1-mesa-dev
+# build heimdall
+RUN mkdir -p /projects \
+    && cd /projects \
+    && git clone https://gitlab.com/BenjaminDobell/Heimdall.git \
+    && cd Heimdall \
+    && mkdir build \
+    && cd build \
+    && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DDISABLE_FRONTEND=ON ../ \
+    && cmake --build . --target install
 
 # direct halium deps
-RUN apt -y install git gnupg flex bison gperf \
+RUN apt -y install gnupg flex bison gperf \
   zip bzr curl libc6-dev libncurses5-dev:i386 x11proto-core-dev \
   libx11-dev:i386 libreadline6-dev:i386 libgl1-mesa-glx:i386 \
   libgl1-mesa-dev g++-multilib mingw-w64-i686-dev tofrodos \
