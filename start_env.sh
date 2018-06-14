@@ -1,16 +1,13 @@
 #!/bin/bash
 
 # Usage:
-# ./start_env.sh /path/to/phone_device
-# ./start_env.sh /dev/bus/usb/001/006
-# TODO: autodetect device...
-
-DEVICE=$1
+# ./start_env.sh
+# All USB devices are shared with container
 
 docker run \
     --privileged \
     -it \
     --rm \
-    --device=$DEVICE \
+    -v /dev/bus/usb:/dev/bus/usb \
     -v /home/halium:/home/halium \
     halium_build_env:latest
