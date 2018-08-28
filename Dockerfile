@@ -37,6 +37,11 @@ RUN apt install -y cpio
 RUN apt install -y qemu binfmt-support qemu-user-static e2fsprogs sudo
 
 RUN mkdir -p /home/halium
+
+# setup git user name & email (change this!)
+RUN git config --global user.name "Alexey Min"
+RUN git config --global user.email alexey.min@gmail.com
+
 WORKDIR /home/halium
  
 CMD [ "/bin/bash" ]
