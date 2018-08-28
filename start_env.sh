@@ -9,5 +9,5 @@ docker run \
     -it \
     --rm \
     -v /dev/bus/usb:/dev/bus/usb \
-    -v /home/halium:/home/halium \
+    -v /home/halium:/home/halium/buildroot \
     halium_build_env:latest
