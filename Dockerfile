@@ -6,7 +6,7 @@ RUN dpkg --add-architecture i386
 RUN apt update && apt -y upgrade
 
 # useful utils
-RUN apt install -y usbutils net-tools android-tools-adb android-tools-fsutils
+RUN apt install -y usbutils net-tools android-tools-adb android-tools-fsutils nano
 
 # deps for building heimdall from source
 RUN apt install -y build-essential git cmake
