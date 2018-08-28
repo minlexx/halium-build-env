@@ -36,11 +36,18 @@ RUN apt install -y cpio
 # required by JBB's halium-install-standalone
 RUN apt install -y qemu binfmt-support qemu-user-static e2fsprogs sudo
 
-RUN mkdir -p /home/halium
+# setup local user (change GID and UID to yours)
+RUN groupadd --gid 10001 halium_devs
+RUN useradd --uid 10105 -s /bin/bash -d /home/halium -g 10001 halium_dev
+RUN mkdir /home/halium && chown -R halium_dev:halium_devs /home/halium
+
+COPY --chown=halium_dev:halium_devs .bashrc /home/halium/
+
+USER halium_dev
 
 # setup git user name & email (change this!)
 RUN git config --global user.name "Alexey Min"
-RUN git config --global user.email alexey.min@gmail.com
+RUN git config --global user.email "alexey.min@gmail.com"
 
 WORKDIR /home/halium
  
