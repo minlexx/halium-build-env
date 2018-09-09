@@ -41,7 +41,10 @@ RUN groupadd --gid 10001 halium_devs
 RUN useradd --uid 10105 -s /bin/bash -d /home/halium -g 10001 halium_dev
 RUN echo "halium_dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN mkdir /home/halium && chown -R halium_dev:halium_devs /home/halium
+# to access USB devices some needs to be in plugdev group or usb
 RUN gpasswd -a halium_dev plugdev
+RUN groupadd --gid 85 usb
+RUN gpasswd -a halium_dev usb
 
 COPY --chown=halium_dev:halium_devs .bashrc /home/halium/
 # new version of repo
