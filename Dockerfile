@@ -35,6 +35,9 @@ RUN apt install -y imagemagick
 RUN apt install -y cpio
 # required by JBB's halium-install-standalone
 RUN apt install -y qemu binfmt-support qemu-user-static e2fsprogs sudo
+# required for make menuconfig in kernel
+# (cd $OUT/obj/KERNEL_OBJ && ARCH=arm CROSS_COMPILE=arm-linux-androidkernel- V=1 make menuconfig)
+RUN apt install -y libncursesw5-dev
 
 # setup local user (change GID and UID to yours)
 RUN groupadd --gid 10001 halium_devs
