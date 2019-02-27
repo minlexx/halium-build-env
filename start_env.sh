@@ -5,7 +5,7 @@
 # All USB devices are shared with container
 
 # Path to halium source root directory on host side
-HALIUM_HOST_HOME=/home/halium
+HALIUM_HOST_HOME=/var/2tb-hdd/halium
 
 docker run \
     --privileged \
