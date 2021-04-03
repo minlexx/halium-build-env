@@ -14,7 +14,7 @@ RUN apt install -y zlib1g-dev libssl-dev libusb-1.0.0-dev libgl1-mesa-glx libgl1
 # build heimdall
 RUN mkdir -p /projects \
     && cd /projects \
-    && git clone https://gitlab.com/BenjaminDobell/Heimdall.git \
+    && git clone https://github.com/Benjamin-Dobell/Heimdall.git \
     && cd Heimdall \
     && mkdir build \
     && cd build \
