@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 # we need i386 libs...
 RUN dpkg --add-architecture i386
@@ -6,59 +6,70 @@ RUN dpkg --add-architecture i386
 RUN apt update && apt -y upgrade
 
 # useful utils
-RUN apt install -y usbutils net-tools android-tools-adb android-tools-fsutils nano
+RUN DEBIAN_FRONTEND=noninteractive apt install -y usbutils net-tools nano sudo neofetch curl
+# Android tools
+RUN DEBIAN_FRONTEND=noninteractive apt install -y adb fastboot heimdall-flash android-sdk-libsparse-utils
+# some development tools
+RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential git cmake
 
-# deps for building heimdall from source
-RUN apt install -y build-essential git cmake
-RUN apt install -y zlib1g-dev libssl-dev libusb-1.0.0-dev libgl1-mesa-glx libgl1-mesa-dev
-# build heimdall
-RUN mkdir -p /projects \
-    && cd /projects \
-    && git clone https://github.com/Benjamin-Dobell/Heimdall.git \
-    && cd Heimdall \
-    && mkdir build \
-    && cd build \
-    && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DDISABLE_FRONTEND=ON ../ \
-    && cmake --build . --target install
+# direct LineageOS dependencies as listed in build wiki page
+RUN DEBIAN_FRONTEND=noninteractive apt -y install \
+	bc bison build-essential ccache curl flex \
+	g++-multilib gcc-multilib git gnupg gperf imagemagick \
+	lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \
+	libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 \
+	libxml2-utils lzop pngcrush rsync schedtool squashfs-tools \
+	xsltproc zip zlib1g-dev
 
-# direct halium deps
-RUN apt -y install gnupg flex bison gperf \
-  zip bzr curl libc6-dev libncurses5-dev:i386 x11proto-core-dev \
-  libx11-dev:i386 libreadline6-dev:i386 libgl1-mesa-glx:i386 \
-  libgl1-mesa-dev g++-multilib mingw-w64-i686-dev tofrodos \
-  python-markdown libxml2-utils xsltproc zlib1g-dev:i386 schedtool \
-  repo liblz4-tool bc lzop
-
-# halium docs don't say that, but imagemagick is also needed (for mka mkbootimg)
-RUN apt install -y imagemagick
-# cpio is needed to build images...
-RUN apt install -y cpio
-# required by JBB's halium-install-standalone
-RUN apt install -y qemu binfmt-support qemu-user-static e2fsprogs sudo
+# needed to build images...
+RUN apt install -y cpio e2fsprogs
+# QEMU user emulation
+RUN apt install -y qemu binfmt-support qemu-user-static
 # required for make menuconfig in kernel
 # (cd $OUT/obj/KERNEL_OBJ && ARCH=arm CROSS_COMPILE=arm-linux-androidkernel- V=1 make menuconfig)
-RUN apt install -y libncursesw5-dev
+#RUN apt install -y libncursesw5-dev
+# ncurses dev package is already instaled as part of LOS deps above?
 
-# setup local user (change GID and UID to yours)
-RUN groupadd --gid 10001 halium_devs
-RUN useradd --uid 10105 -s /bin/bash -d /home/halium -g 10001 halium_dev
-RUN echo "halium_dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-RUN mkdir /home/halium && chown -R halium_dev:halium_devs /home/halium
-# to access USB devices some needs to be in plugdev group or usb
-RUN gpasswd -a halium_dev plugdev
+# Different versions of LineageOS require different JDK (Java Development Kit) versions.
+# LineageOS 18.1: OpenJDK 11 (included in source download)
+# LineageOS 16.0-17.1: OpenJDK 1.9 (included in source download)
+# LineageOS 14.1-15.1: OpenJDK 1.8 (install openjdk-8-jdk)
+#RUN DEBIAN_FRONTEND=noninteractive apt install -y openjdk-8-jdk
+
+# setup local user (change GID and UID to match yours in the host system)
+RUN groupadd --gid 1000 los_devs
+RUN useradd --uid 10105 -s /bin/bash -d /home/los_dev -g 1000 los_dev
+RUN echo "los_dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN mkdir /home/los_dev
+RUN mkdir /home/los_dev/bin
+RUN chown -R los_dev:los_devs /home/los_dev
+# to access USB devices you need to be in plugdev group or usb
+RUN gpasswd -a los_dev plugdev
 RUN groupadd --gid 85 usb
-RUN gpasswd -a halium_dev usb
+RUN gpasswd -a los_dev usb
 
-COPY --chown=halium_dev:halium_devs .bashrc /home/halium/
-# new version of repo
-COPY --chown=root:root repo /usr/bin
+COPY --chown=los_dev:los_devs .bashrc /home/los_dev/
 
-USER halium_dev
+# Download fresh version of repo (this is only done once during creation of the container)
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /home/los_dev/bin/repo
+RUN chmod a+x /home/los_dev/bin/repo
+# And then repo should be able to suggest to auto-update itself, make it writable by user
+RUN chown los_dev:los_devs /home/los_dev/bin/repo
+
+# To allow repo to run, replace '#!/usr/bin/env python' => '#!/usr/bin/env python3'
+RUN sed -i 's_#!/usr/bin/env python_#!/usr/bin/env python3_' /home/los_dev/bin/repo
+
+# Apparently the line above does not help, some other build scripts require
+#  /usr/bin/python, which is not present! Let /usr/bin/python point to python3,
+#  this seems to work in my tests
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+USER los_dev
 
 # setup git user name & email (change this!)
 RUN git config --global user.name "Alexey Min"
 RUN git config --global user.email "alexey.min@gmail.com"
 
-WORKDIR /home/halium
+WORKDIR /home/los_dev
  
 CMD [ "/bin/bash" ]

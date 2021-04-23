@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -t halium_build_env .
+docker build -t los_build_env .
