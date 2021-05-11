@@ -36,9 +36,14 @@ RUN apt install -y qemu binfmt-support qemu-user-static
 # LineageOS 14.1-15.1: OpenJDK 1.8 (install openjdk-8-jdk)
 #RUN DEBIAN_FRONTEND=noninteractive apt install -y openjdk-8-jdk
 
-# setup local user (change GID and UID to match yours in the host system)
-RUN groupadd --gid 1000 los_devs
-RUN useradd --uid 10105 -s /bin/bash -d /home/los_dev -g 1000 los_dev
+# setup local user (specify GID and UID to match yours in the host system)
+# Should match the ones used in your host system to be able to access the same build tree.
+# Inside the container user los_devs with a group los_devs will be created with those IDs.
+ARG user_uid=1000
+ARG user_gid=10105
+
+RUN groupadd --gid ${user_gid} los_devs
+RUN useradd --uid ${user_uid} -s /bin/bash -d /home/los_dev -g ${user_gid} los_dev
 RUN echo "los_dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN mkdir /home/los_dev
 RUN mkdir /home/los_dev/bin
@@ -67,8 +72,10 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 USER los_dev
 
 # setup git user name & email (change this!)
-RUN git config --global user.name "Alexey Min"
-RUN git config --global user.email "alexey.min@gmail.com"
+ARG git_user_name="Alexey Min"
+ARG git_user_email="alexey.min@gmail.com"
+RUN git config --global user.name "${git_user_name}"
+RUN git config --global user.email "${git_user_email}"
 
 WORKDIR /home/los_dev
  
