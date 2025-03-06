@@ -41,6 +41,7 @@ RUN apt install -y qemu binfmt-support qemu-user-static
 # Inside the container user los_devs with a group los_devs will be created with those IDs.
 ARG user_uid=1000
 ARG user_gid=10105
+ARG usb_gid=85
 
 RUN groupadd --gid ${user_gid} los_devs
 RUN useradd --uid ${user_uid} -s /bin/bash -d /home/los_dev -g ${user_gid} los_dev
@@ -50,7 +51,7 @@ RUN mkdir /home/los_dev/bin
 RUN chown -R los_dev:los_devs /home/los_dev
 # to access USB devices you need to be in plugdev group or usb
 RUN gpasswd -a los_dev plugdev
-RUN groupadd --gid 85 usb
+RUN groupadd --gid ${usb_gid} usb
 RUN gpasswd -a los_dev usb
 
 COPY --chown=los_dev:los_devs .bashrc /home/los_dev/
