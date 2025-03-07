@@ -63,7 +63,8 @@ RUN chmod a+x /home/los_dev/bin/repo
 RUN chown los_dev:los_devs /home/los_dev/bin/repo
 
 # To allow repo to run, replace '#!/usr/bin/env python' => '#!/usr/bin/env python3'
-RUN sed -i 's_#!/usr/bin/env python_#!/usr/bin/env python3_' /home/los_dev/bin/repo
+#RUN sed -i 's_#!/usr/bin/env python_#!/usr/bin/env python3_' /home/los_dev/bin/repo
+# ^^ This seems to be no longer needed
 
 # Apparently the line above does not help, some other build scripts require
 #  /usr/bin/python, which is not present! Let /usr/bin/python point to python3,
