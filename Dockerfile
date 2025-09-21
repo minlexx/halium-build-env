@@ -23,6 +23,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install \
 
 # needed to build images...
 RUN apt install -y cpio e2fsprogs
+# needed to extract proprietary blobs from pre-made zips (block-based OTAs)
+RUN apt install -y brotli
+# needed to extract proprietary blobs from system/vendor like:
+#    $ sdat2img.py system.transfer.list system.new.dat system.img
+RUN git clone https://github.com/xpirt/sdat2img.git
+RUN cp sdat2img/sdat2img.py /usr/bin/sdat2img
+RUN chmod +x /usr/bin/sdat2img
+RUN rm -rf sdat2img
 # QEMU user emulation
 RUN apt install -y qemu binfmt-support qemu-user-static
 # required for make menuconfig in kernel
