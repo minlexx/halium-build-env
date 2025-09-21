@@ -10,7 +10,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y usbutils net-tools nano sudo n
 # Android tools
 RUN DEBIAN_FRONTEND=noninteractive apt install -y adb fastboot heimdall-flash android-sdk-libsparse-utils
 # some development tools
-RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential git cmake
+RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential git git-lfs cmake
 
 # direct LineageOS dependencies as listed in build wiki page
 RUN DEBIAN_FRONTEND=noninteractive apt -y install \
