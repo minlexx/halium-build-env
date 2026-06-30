@@ -4,6 +4,8 @@ USER_ID=$( id -u )
 USER_GID=$( id -g )
 USB_GID=$( grep usb /etc/group | cut -d ':' -f 3 )
 
+echo "Building image for UID=${USER_ID}, GID=${USER_GID}, USB_GID=${USB_GID}"
+
 docker build \
 	--build-arg user_uid=${USER_ID} \
 	--build-arg user_gid=${USER_GID} \
